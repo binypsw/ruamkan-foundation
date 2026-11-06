@@ -1,0 +1,26 @@
+sequenceDiagram
+  actor U as ผู้ช่วยเหลือ
+  participant B as เบราว์เซอร์
+  participant W as web
+  participant A as API
+  participant D as db
+  participant P as Payment Gateway
+  U->>B: เลือก 1,000 บาท ติ๊กทิป 5%
+  B->>W: GET /projects/id
+  W->>A: ดึงโครงการ
+  A->>D: SELECT project + ยอดรวม
+  D-->>A: Active ยอด 38,000 จาก 50,000
+  A-->>B: หลอดความคืบหน้า
+  B->>A: POST /donations amount 1000 tip true
+  A->>D: BEGIN · SELECT projects FOR UPDATE
+  A->>A: ตรวจ BR-23 BR-06 คำนวณ tip 50.00
+  A->>D: INSERT donations pending
+  A->>P: สร้าง Dynamic QR 1,050.00
+  P-->>A: QR
+  A-->>B: แสดง QR
+  U->>P: สแกนจ่าย
+  P-->>A: webhook paid fee 25.00
+  A->>D: UPDATE donations paid · INSERT ledger in 1,000.00 และ fee 25.00 (คงเหลือ 975.00)
+  A->>D: INSERT receipts · COMMIT
+  A-->>B: 200 ยอดโครงการเพิ่ม
+  A-->>U: LINE ใบเสร็จ + Tier 2 (FR-40, 45)

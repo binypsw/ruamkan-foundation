@@ -1,0 +1,31 @@
+# โปรเจกต์ Docker ฐานข้อมูล: ruamkan-db (สร้าง network ruamkan-net ให้ web ต่อเข้ามา)
+name: ruamkan-db
+services:
+  ruamkan-db:
+    image: postgres:16-alpine
+    container_name: ruamkan-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ruamkan
+      POSTGRES_PASSWORD: ruamkan_dev_pw
+      POSTGRES_DB: ruamkan
+      TZ: Asia/Bangkok
+      PGTZ: Asia/Bangkok
+    ports:
+      - "5433:5432"
+    volumes:
+      - ruamkan-pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - ruamkan-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ruamkan -d ruamkan"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+volumes:
+  ruamkan-pgdata:
+    name: ruamkan-pgdata
+networks:
+  ruamkan-net:
+    name: ruamkan-net

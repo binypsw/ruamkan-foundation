@@ -1,0 +1,17 @@
+sequenceDiagram
+  actor A1 as คุณ A
+  actor A2 as คุณ B
+  participant API as API
+  participant DB as db
+  Note over DB: กระเบื้อง ต้องการ 50 จองแล้ว 49 ขาด 1 แผ่น
+  par พร้อมกัน
+    A1->>API: POST /pledges qty 1
+  and
+    A2->>API: POST /pledges qty 1
+  end
+  API->>DB: A: BEGIN · UPDATE project_items SET reserved = 50 WHERE reserved + 1 <= 50
+  API->>DB: B: BEGIN · UPDATE ... WHERE reserved + 1 <= 50 (รอ lock ของ A)
+  DB-->>API: A: 1 แถว · INSERT item_pledges · COMMIT
+  DB-->>API: B: 0 แถว (reserved = 50 แล้ว) · ROLLBACK
+  API-->>A1: 201 ใบปะหน้า + tracking
+  API-->>A2: 409 ของถูกจองครบแล้ว (FR-32, BR-26)

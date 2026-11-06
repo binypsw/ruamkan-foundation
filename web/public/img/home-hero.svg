@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" role="img" aria-label="ชุมชนร่วมกันสร้างฝายและบ้าน">
+<rect width="360" height="220" rx="16" fill="#fbf5ea"/>
+<circle cx="290" cy="50" r="30" fill="#f6dccd"/>
+<path d="M0 150Q90 115 180 150T360 140V220H0Z" fill="#e3e9cd"/>
+<path d="M0 180Q100 150 200 178T360 168V220H0Z" fill="#55642a" opacity=".85"/>
+<path d="M60 120l50-42 50 42z" fill="#a8461f"/><rect x="72" y="120" width="76" height="46" fill="#fff" stroke="#1f2f4d" stroke-width="3"/><rect x="100" y="138" width="18" height="28" fill="#1f2f4d"/>
+<path d="M200 140h120v12H200z" fill="#1f2f4d"/><path d="M205 152q15 10 30 0t30 0 30 0 25 0v12H205z" fill="#8fb3d9"/>
+<path d="M180 70c-30-20-45 5-30 20 8 8 22 16 30 24 8-8 22-16 30-24 15-15 0-40-30-20z" fill="#a8461f" transform="translate(0 -20)"/>
+</svg>

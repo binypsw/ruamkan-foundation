@@ -1,0 +1,19 @@
+sequenceDiagram
+  actor S as ต้นเรื่อง
+  participant B as เบราว์เซอร์
+  participant A as API
+  participant D as db
+  actor F as เจ้าหน้าที่
+  participant P as Payment Gateway
+  S->>B: อัปโหลดใบเสร็จ + รูปงวด 1
+  B->>A: POST /milestones/1/evidence
+  A->>D: INSERT milestone_evidence · UPDATE milestones requested
+  A-->>F: แจ้งงานรอตรวจ
+  F->>A: POST /milestones/1/approve
+  A->>D: ตรวจ frozen = false และสิทธิ์ staff NFR-10
+  A->>A: ตรวจ BR-09 BR-11
+  A->>D: BEGIN · UPDATE wallets balance − 20,000 (CHECK balance >= 0)
+  A->>P: จ่ายผ่าน QR ร้านวัสดุ
+  P-->>A: สำเร็จ
+  A->>D: INSERT disbursements · INSERT ledger out · INSERT audit_log · COMMIT
+  A-->>S: LINE งวด 1 จ่ายแล้ว

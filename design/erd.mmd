@@ -1,0 +1,195 @@
+erDiagram
+  users ||--o{ projects : "ตั้ง (ต้นเรื่อง)"
+  users ||--o| kyc_records : "ยืนยันตัวตน"
+  users ||--o{ donations : "บริจาค"
+  users ||--o{ item_pledges : "จองของ"
+  users ||--o{ volunteer_signups : "สมัครอาสา"
+  users ||--o{ vouchings : "รับรอง"
+  users ||--o{ flags : "ร้องเรียน"
+  users ||--o{ signatures : "ลงชื่อ"
+  projects ||--o{ project_support_types : "รูปแบบที่ขอ"
+  projects ||--o{ project_items : "รายการของ"
+  projects ||--o{ skill_needs : "ขอคน"
+  projects ||--o{ loan_requests : "ขอยืม"
+  projects ||--o{ reward_tiers : "สิ่งตอบแทน"
+  projects ||--o{ milestones : "งวดเบิก"
+  projects ||--o{ vouchings : "ผู้รับรอง"
+  projects ||--o{ reviews : "ผลตรวจ"
+  projects ||--o{ donations : "รับเงิน"
+  projects ||--o{ flags : "ถูกร้องเรียน"
+  projects ||--o{ signatures : "รายชื่อ"
+  projects ||--|| wallets : "บัญชีพัก"
+  project_items ||--o{ item_pledges : "ถูกจอง"
+  skill_needs ||--o{ volunteer_signups : "คนมาช่วย"
+  volunteer_signups ||--o| checkins : "เช็กอิน"
+  loan_requests ||--o{ loans : "สัญญายืม"
+  milestones ||--o{ milestone_evidence : "ใบเสร็จ/รูป"
+  milestones ||--o{ disbursements : "จ่ายเงิน"
+  donations ||--o| receipts : "ใบเสร็จ"
+  wallets ||--o{ ledger_entries : "รายการบัญชี"
+  donations ||--o{ ledger_entries : "ก่อรายการ"
+  disbursements ||--o{ ledger_entries : "ก่อรายการ"
+  users {
+    uuid id PK
+    text email
+    text role "starter helper voucher staff finance exec"
+    text display_name
+    boolean consent_show_name
+    text address_enc "เข้ารหัส"
+    geography home_point
+  }
+  kyc_records {
+    uuid user_id PK
+    text id_card_enc "เข้ารหัส"
+    boolean face_verified
+    timestamptz verified_at
+  }
+  projects {
+    uuid id PK
+    uuid starter_id FK
+    text status "pending active suspended closed rejected"
+    text funding_mode "all_or_nothing flexible"
+    numeric target_amount "NUMERIC(12,2) 1000..500000"
+    integer duration_hours "360 720 72"
+    timestamptz activated_at
+    timestamptz ends_at
+    integer resubmit_count "0..2"
+    boolean frozen
+  }
+  project_support_types {
+    uuid project_id FK
+    text type "money item labor loan advocacy"
+  }
+  project_items {
+    uuid id PK
+    uuid project_id FK
+    text name
+    integer qty_needed
+    integer qty_reserved "CHECK reserved <= needed"
+  }
+  skill_needs {
+    uuid id PK
+    uuid project_id FK
+    text skill
+    integer headcount
+    timestamptz work_date
+  }
+  loan_requests {
+    uuid id PK
+    uuid project_id FK
+    text item_name
+    integer days
+  }
+  loans {
+    uuid id PK
+    uuid loan_request_id FK
+    uuid lender_id FK
+    text status "active returned overdue"
+    date due_date
+  }
+  reward_tiers {
+    uuid id PK
+    uuid project_id FK
+    numeric min_amount "NUMERIC(12,2)"
+    text description
+  }
+  milestones {
+    uuid id PK
+    uuid project_id FK
+    integer seq
+    numeric percent "NUMERIC(5,2)"
+    numeric amount "NUMERIC(12,2)"
+    text status "locked requested approved paid"
+  }
+  milestone_evidence {
+    uuid id PK
+    uuid milestone_id FK
+    text kind "receipt photo"
+    text file_url
+  }
+  disbursements {
+    uuid id PK
+    uuid milestone_id FK
+    numeric amount "NUMERIC(12,2)"
+    text payee_type "starter merchant"
+    text merchant_name
+    timestamptz paid_at
+  }
+  vouchings {
+    uuid id PK
+    uuid project_id FK
+    uuid voucher_id FK
+    numeric distance_km "NUMERIC(5,2)"
+    text status "taken submitted released"
+    timestamptz taken_at
+  }
+  reviews {
+    uuid id PK
+    uuid project_id FK
+    uuid staff_id FK
+    text decision "approve reject"
+    text reason
+    timestamptz decided_at
+  }
+  donations {
+    uuid id PK
+    uuid project_id FK
+    uuid donor_id FK
+    numeric amount "NUMERIC(12,2) >= 20"
+    numeric tip "NUMERIC(12,2)"
+    numeric gateway_fee "NUMERIC(12,2)"
+    boolean to_central_fund
+    text status "pending paid refunded"
+    text refund_choice "refund central none"
+  }
+  receipts {
+    uuid id PK
+    uuid donation_id FK
+    boolean edonation_sent
+    timestamptz issued_at
+  }
+  item_pledges {
+    uuid id PK
+    uuid item_id FK
+    uuid donor_id FK
+    integer qty
+    text tracking_no
+  }
+  volunteer_signups {
+    uuid id PK
+    uuid need_id FK
+    uuid user_id FK
+  }
+  checkins {
+    uuid signup_id PK
+    timestamptz at
+  }
+  signatures {
+    uuid project_id FK
+    uuid user_id FK
+  }
+  flags {
+    uuid id PK
+    uuid project_id FK
+    uuid reporter_id FK
+    text evidence_url
+  }
+  wallets {
+    uuid id PK
+    uuid project_id FK
+    numeric balance "NUMERIC(12,2) CHECK >= 0"
+  }
+  ledger_entries {
+    uuid id PK
+    uuid wallet_id FK
+    text kind "in out fee"
+    numeric amount "NUMERIC(12,2)"
+    timestamptz at
+  }
+  audit_log {
+    uuid id PK
+    uuid actor_id FK
+    text action "approve release freeze unfreeze"
+    uuid project_id FK
+    timestamptz at
+  }

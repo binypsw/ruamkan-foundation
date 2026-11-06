@@ -1,0 +1,5 @@
+node_modules/
+.next/
+web/storage/*
+!web/storage/.gitkeep
+*.log

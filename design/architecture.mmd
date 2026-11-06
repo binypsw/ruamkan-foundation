@@ -1,0 +1,33 @@
+flowchart LR
+  subgraph PC["เครื่องของเรา"]
+    BR["เบราว์เซอร์ / PWA บนมือถือ<br/>+ Playwright ตอนทดสอบ"]
+  end
+  subgraph WEB["Docker: ruamkan-web (พอร์ต 3000)"]
+    UI["หน้าเว็บ Next.js App Router"]
+    API["API Route Handlers"]
+    RULES["lib/rules กฎมูลนิธิ BR-01..36"]
+    DBL["lib/db"]
+    JOB["งานตั้งเวลา: ปิดโครงการ / คืนเงิน 7 วัน"]
+  end
+  subgraph DBP["Docker: ruamkan-db (เปิดพอร์ต 5433 บนเครื่อง)"]
+    PG[("PostgreSQL 16<br/>ruamkan-db:5432")]
+  end
+  subgraph EXT["ระบบภายนอก (ตอนทดสอบใช้ตัวจำลอง mock)"]
+    PSP["Payment Gateway<br/>PromptPay QR / บัตร"]
+    KYC["e-KYC Provider"]
+    LINE["LINE OA / LIFF"]
+    RD["กรมสรรพากร e-Donation"]
+    FS["Object Storage<br/>รูป เสียง วิดีโอ"]
+  end
+  BR -->|"HTTP :3000"| UI
+  UI --> API
+  API --> RULES
+  RULES --> DBL
+  JOB --> RULES
+  DBL -->|"ruamkan-net: ruamkan-db:5432"| PG
+  API --> PSP
+  PSP -.->|"webhook ยืนยันการจ่าย"| API
+  API --> KYC
+  API --> LINE
+  API --> RD
+  API --> FS
